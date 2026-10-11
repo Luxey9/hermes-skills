@@ -1,0 +1,9 @@
+{
+  "last_report_path": "C:\\Users\\MyBook Hype AMD\\AppData\\Local\\hermes\\logs\\curator\\20261004-011322",
+  "last_run_at": "2026-10-04T01:13:22.849248+00:00",
+  "last_run_duration_seconds": 1.324981,
+  "last_run_summary": "auto: 1 marked stale; llm: skipped (consolidation off)",
+  "last_run_summary_shown_at": "2026-09-10T06:29:36.327703+00:00",
+  "paused": false,
+  "run_count": 2
+}

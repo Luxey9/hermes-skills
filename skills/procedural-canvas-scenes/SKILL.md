@@ -1,0 +1,64 @@
+---
+name: procedural-canvas-scenes
+description: Use when editing procedural canvas scene renderers.
+version: 1.0.0
+---
+
+# Procedural Canvas Scenes
+
+Edit large single-file canvas renderers (e.g. isometric offices, sprite animation, live visualizers) safely: read first, patch by anchored replace, verify syntax every step.
+
+## Procedure
+
+1. Read the actual files before designing — `index.html`, `style.css`, renderer JS, plus the server/collector that feeds events. Match the existing projection, palette, and event protocol; do not invent a new stack.
+2. Back up the renderer (`renderer.js.bak`) before the first patch.
+3. Patch with anchored string replace, one concern per patch: assert the anchor exists before replacing, replace once, write, then run `node --check` on the file (`node --input-type=module --check < file` via stdin for `<script type="module">` renderers — plain check parses as CommonJS and rejects `import`). If the anchor is missing, read the surrounding lines and re-anchor — never guess. If the anchor misses twice on whitespace/CRLF mismatch, or the patch tool refuses with escape-drift on backslash-heavy lines (JS regex), stop re-anchoring and do the replace in Python directly (read file, replace by line index or `str.replace` once, building backslash runs with `chr(92)` to dodge JSON escape layering, write back, `node --check`) — repeated patch misses burn turns. After every renderer JS edit, bump the script query version in `index.html` (`office2.js?v=<unix-timestamp>`) so the browser fetches the new file instead of serving the stale cached copy.
+4. For large rewrites the write tool may reject the payload: split the new file into parts, append part-by-part via file writes in code, then copy into place and `node --check`.
+5. Verify draw helpers in BOTH directions: every defined function must have a call site (zero calls = dead code — wire it in or delete it), AND every called helper must have a definition — a call to a never-defined helper (renamed or never-written `makeLabel`-style) throws at build time and kills the whole animation loop, freezing all bubbles/chatter with it. Count `function name` definitions vs `name(` call sites before bumping the version.
+6. Health-check the feeder server (`GET /health`, `POST /hook` smoke test) and report what was and was not visually verified.
+
+## Reference images
+
+- Analyze each reference image with a separate call, one question per image: layout, furniture, palette, lighting, distinct props recreatable procedurally.
+- If a call is rate-limited, retry that single image serially — do not re-fire the whole batch.
+- Distill images to a prop list (one function per prop: `drawSofa`, `drawSconce`, ...), then implement each as a small procedural draw function in the file's own projection system.
+
+## Event-consumer pitfalls (SSE → scene)
+
+- Give transient event speech its own channel: add a `src`/priority parameter to the speak function and let ambient chatter be silenced without touching event speech — never reassign a function declaration to wrap it, since reassignment inside an IIFE fails silently and the wrapper never runs.
+- Buffer the event feeder so late-connecting viewers still see history: keep a capped backlog (e.g. last 200 events) and replay it to each new SSE subscriber on connect — otherwise events sent before the browser opens are lost with no error.
+- Spawn on first-seen session in tool/message handlers, not only on session_start: a feeder restart wipes the in-memory backlog, so later tool/chat events arrive for sessions the renderer never saw start — dropping them for 'unknown session' renders an empty scene with no error.
+- Normalize both key casings at the feeder boundary (`session_id` and `sessionId`, `agent_id` and `agentId`) — producers disagree, and a missed key silently routes events to a fallback session that spawns duplicate agents.
+- Dedup one logical entity to one visual: when a new session starts for an already-represented project, reuse the living agent and update its session binding instead of spawning a second — identical labels make the duplicate look like a render bug.
+- Show tool work as a short lifecycle: on tool_start set pose to typing and show `⏳ <tool>` via the event channel; on tool_end clear the tool state, show `✓ <tool>` for ~2s, then let the bubble expire so the agent returns to idle chatter — never leave the start bubble hanging at its full timeout.
+- Keep synthetic/ambient speech clearly separable from real events (distinct function or flagged channel) so a single user command can silence all fake yapping without muting genuine tool/chat visuals; route important-sounding fakes (DB queries, error storms, progress claims) to pose-only with no bubble, reserving bubbles for rare harmless human ocehan and real events.
+
+## Panel & naming pitfalls (frontend chrome)
+
+- Resolve display labels at the feeder, not the renderer: walk each input path from the DEEPEST segment outward and take the first directory that survives the generic-denylist (frontend, server, scripts, documents, home) — `scripts/stop.sh` must resolve to the project root, never to `scripts`. Remember the name per session so later path-less events reuse it — never persist a bare repo/folder name as the visible project.
+- Never render a fallback session word (e.g. `Sesi`) as a visible nametag: when auto-spawning from a tool/message event before any session_start carries a project, spawn unlabeled or marked unknown and update the label live once the project arrives — a placeholder label reads as the project name in screenshots.
+- Coalesce bursty activity-log rows: group identical tool+label events inside a short window (e.g. 8s) into one row with a ×N badge instead of appending a row per event, and paginate (8 rows/page, capped store of ~200) with prev/next controls — an infinite prepend list turns into an unreadable pile under real tool-call volume.
+- Build shortcut chrome as clickable buttons wired to the same functions as the keyboard handlers, not as a static key list — a read-only shortcut panel duplicates the header buttons and confuses users about which control is live.
+- Keep DOM wiring inside the IIFE that owns the renderer: a patch that appends `getElementById` listeners after the closing `})();` produces `Unexpected token ')'` on `node --check` — anchor new wiring next to the existing button bindings inside the closure.
+- Render `node --check` output precisely: it prints only the first syntax error. After fixing one error, re-run — a second error (e.g. an extra `}` from a join/notify patch colliding with an adjacent log line) is routinely hiding behind the first.
+- Lazy-load third-party embeds (YouTube ambience, etc.): keep `src` empty in a `data-src` attribute and set it only when the user toggles playback, clearing it on hide — an eager iframe autoplays on page load and its absolute-positioned box overlaps the canvas.
+
+## Parallel-renderer & module pitfalls (2D + 3D)
+
+- After updating one renderer, run a feature-presence matrix across both: count each feature token (bubble guard, agent list, duration scaling, log dedup) in each file — every feature present in one and missing in the other becomes an explicit port/adapt/skip decision, never silent drift.
+- When vendoring ESM behind an importmap prefix (`three/addons/` → `./vendor/`), mirror the FULL subpath locally (`vendor/controls/OrbitControls.js`) — the browser appends the remainder to the mapped prefix, so a flat file 404s; curl-verify every mapped URL for non-zero bytes, not just HTTP 200.
+- Canvas-2D text tricks do not transfer to Three.js sprite labels: a marquee via clip-region needs per-frame texture redraws on a static CanvasTexture — accept truncation or budget the redraws explicitly.
+
+## Ambience & camera pitfalls
+
+- Build sound with dependency-free WebAudio (oscillator beeps for join/leave/tool/chat/error, generative pad chords for ambience) plus an optional hidden `<audio loop>` element for a local MP3 served by the same static server (add the MIME type, e.g. `.mp3` → `audio/mpeg`) — toggle play/pause from one button with no visible player bar when the user wants audio without chrome.
+- Offer camera POV presets as buttons + keys (All → Dev → Meeting → Lounge → Server → Pantry → Foyer), plus drag-to-pan and stepwise 90° rotation by transforming grid coordinates inside the projection function — free-tilt 3D remains impossible for isometric sprites, so presets plus 4-side rotation are the honest version of "multiple viewpoints". Disambiguate click from drag (suppress the click when the pointer moved) and stop follow on pan. When a floor-filter control and agent-follow coexist, sync the filter to the followed agent's floor (and re-sync on a ~1s throttle while they move, including lift rides) — a stale filter hides the followed agent and makes follow look broken; conversely, a manual filter press must release follow first so the two do not fight over the camera.
+- When adding lounge furniture (beanbags, extra sofas), add both the draw call in the scene graph AND the matching `seat()` entry so agents can actually sit there; pair the seats with a group behavior (e.g. 2+ agents chilling in the lounge triggers a shared bubble + sfx + activity-log row) or the new furniture stays empty decor. For circular seating (oval meeting tables), give each seat an explicit facing angle toward the table center — a binary back/front flag only yields 0°/180° and leaves side-sitters facing walls; keep the visual chair positions and the seat-spot coordinates on the same radius or agents sit offset from their chairs.
+- Keep label/bubble stacking explicit: pin the nametag to the head, draw transient bubbles above the nametag with extra gap, never derive one position from the other's leftover variable.
+- Keep fake 3D rotation OUT of iso sprite scenes: rotating grid coords while light/shade sides, wall text, and depth sort stay fixed produces inverted lighting that reads as broken — offer a flat top-down denah mode instead (zone-colored tiles + outline walls + dot agents + same labels), which reuses the existing camera crop so drag/zoom/follow keep working. Delete half-working rotate/POV presets rather than shipping them; a removed control beats a confusing one.
+- When expanding a tile grid, move every dependent: spawn point, wall decor coordinates, shelf/prop spreads, and the camera origin offset — a grid change without its dependents strands furniture off-wall.
+- For stacked floors in one scene, offset the projection globally per floor (a Z-offset added inside P(), toggled per draw call) rather than duplicating the layout: tag each furniture call and seat with its floor, sort depth with a floor bias, interpolate a per-agent floor value along stair waypoints (so walkers glide vertically through the stairwell), and add a zoom-out step so both floors fit — agents render at their own floor offset while the camera crop stays shared.
+- Prefer a floor TOGGLE over vertical stacking when floors share one building shell: vertical stacking needs the full Z-offset plumbing above plus zoom-out and still reads as cramped. Keep a `FLOOR` variable with a toggle button + key, filter furniture with `it(d,f,fl)`, tag seats `seat(...,fl)`, branch `zoneFloor` colors and `SIGNS` per floor, filter the spawn pool and `freeSpots(zone,fl)` by floor, dim agents whose floor differs, and filter denah dots + labels per floor — one clean camera, two distinct contents. When the wall layout itself differs per floor (merged rooms, added partitions), give the wall builder a floor parameter — a single shared wall set cannot express per-floor partitions. Before adding a second per-room furniture pass, grep for the existing room builder covering the same coordinates — two builders emitting the same tables/chairs produce ghost duplicates that read as layout bugs.
+- Route cross-floor trips through the lift instead of floor geometry: walk the agent to the lift, hide it (skip draw, hold a `_hide` flag), wait ~1.5s with door animation, then teleport it to the destination and resume the trip state (`coffee`/`chill`/`meeting`/`pray`/`working`) — on a shared layout this reads as riding the lift with zero extra geometry. Give `freeSpots` an optional floor parameter so trips only draw from the agent's own floor.
+- When the second floor reuses furniture shapes, add optional position parameters to the existing draw function (`drawConfTable(cx,cy)`, `drawTV(x0,x1,y)`) instead of cloning it as `drawConfTable2` — clones drift and double maintenance. New agent poses are one `else-if` branch in the worker renderer using its existing `limb()`/ellipse primitives — no new skeleton needed.
+- Never claim browser verification unless a screenshot was actually inspected; report `node --check` + health-check status honestly instead.
