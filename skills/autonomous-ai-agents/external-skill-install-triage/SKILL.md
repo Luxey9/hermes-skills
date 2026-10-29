@@ -42,6 +42,17 @@ account for the index cost, verify discovery.
    `SKILL.md`, then test each name against the live index (`get_all_skills_dirs` +
    `iter_skill_index_files` + `parse_frontmatter` from `agent.skill_utils`). A name already in the
    index is a no-op or a silent overwrite — report it, install only the free names.
+   `iter_skill_index_files` takes TWO args — `iter_skill_index_files(root, 'SKILL.md')`; calling it
+   with the dir alone raises `TypeError: ... missing 1 required positional argument: 'filename'`.
+   Two names colliding across two candidate repos may be the same skill forked — run step 4b before
+   picking a winner.
+4b. **Diff same-named candidates before treating them as rivals.** Two repos shipping one skill each,
+   same `name`, is usually a fork chain, not two skills. Clone both and compare the bodies with
+   whitespace-insensitive diff: `diff -bB <a>/SKILL.md <b>/SKILL.md`. Identical-besides-blank-lines
+   bodies mean the repos are redundant — merge the DELTAS into one installed skill (the later fork's
+   extra steps are usually the only thing it adds) instead of installing one and dropping the other.
+   Compare content, not repo popularity or URL — the original and the most-forked copy are the same
+   skill, and the `-bB` diff is what proves it.
 5. **Copy the payload** into one category dir of your choosing (see Layout). Copy by named subdir,
    never `cp -r <repo>/.` — that drags `.git` and drops files at the category root.
 6. **Verify all three**, then report:
@@ -65,6 +76,7 @@ account for the index cost, verify discovery.
 | **Tool distribution, not skills** | only `SKILL.md` is `install-<tool>`; payload is `.ts`/`.mjs`/assets | do NOT install. Report what it actually is (e.g. a lint-plugin installer) and ask |
 | **Tool repo vendoring agent skills** | large codebase (tens of MBs) with skills in `.agents/skills/` or `.claude/skills/` | do NOT clone/build full repo or run heavy npm/pip installs; download/copy only the specific `.agents/skills/<name>` directory (~20-50 KB) unless the user explicitly wants the native CLI binary installed |
 | **Repo already in the index cache** | the name only appears in `skills/.hub/index-cache/*.json` | that is the registry's catalog, not an install. Check the filesystem before telling the user a skill is missing |
+| **Two repos, one skill each, SAME `name`** | both are single-skill repos and the name matches | a fork chain, not two skills — run step 4b and merge the deltas into one install |
 | **One file from a monorepo** | `github.com/<owner>/<repo>/blob/<ref>/<path>/SKILL.md` | `curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>/SKILL.md -o <dir>/SKILL.md` |
 
 A repo whose only skill is an *installer* is a tool repo. Installing it into `$HERMES_HOME/skills`
@@ -94,6 +106,9 @@ puts an installer in the system prompt and gives the user nothing to invoke.
   copy was partial.
 - **A `SKILL.md` at the category root becomes a skill named after the folder.** Stray root files
   are not harmless — move them into the skill dir.
+- **Never truncate a result just to shorten it.** Reading only the first slice of a listing or
+  diff hides files and silently drops the mirror-file candidates the whole triage depends on —
+  read the full output and decide from all of it.
 - **`hermes skills list`'s last line is `N hub-installed, N builtin, N local — …`.** The `local`
   count is the one that must grow by the install count; do your own total with the discovery
   snippet, since the printed totals do not equal what the loader sees.
@@ -101,6 +116,10 @@ puts an installer in the system prompt and gives the user nothing to invoke.
   pass `C:/...` forward-slash paths. Run scratch work under `$HERMES_HOME/cache/scratch`.
 - **Large repo → sparse clone** (`--filter=blob:none --sparse` + `git sparse-checkout set skills`)
   before blaming the network.
+- **A name found in `skills/.hub/index-cache/*.json` is NOT an install.** The cache records the
+  registry's catalog (the same skill can appear once per source repo, e.g. two entries both named
+  `llm-council` from different owners). Always confirm against the live index / filesystem before
+  telling the user a name collides or a skill is already installed.
 - **Distinguish repo size from skill payload size.** A GitHub repository size reported by the API includes git history, test fixtures, website assets, and native build artifacts (often 50–100+ MB). Check whether the skill payload is just an isolated subfolder (e.g. `.agents/skills/<name>`) so you don't burden disk or user expectations when only a ~25–50 KB instruction set is needed. Fetch via raw URLs directly instead of full clone.
 
 ## Report shape
@@ -127,6 +146,36 @@ Always re-derive names after any shuffle: a stray file left at the category root
 named after the folder, and a duplicated dir under two category levels yields duplicate names.
 Assert `unique(name) == file_count` and diff the name set against the pre-change set to prove only
 the intended entry disappeared.
+
+## Porting an external skill to Hermes (Claude-Code-native sources)
+
+Most GitHub skill repos target Claude Code / claude.ai, so a straight copy installs a skill whose
+prose names tools Hermes does not have. Retarget the body before you call the install done:
+
+| Claude-Code idiom in the source | Hermes equivalent |
+|---|---|
+| `Glob` / `Read` / `Write` tool names | `search_files`, `read_file`, `write_file` |
+| `CLAUDE.md` as THE project context file | Hermes reads `.hermes.md`/`HERMES.md`, `AGENTS.md`, `CLAUDE.md` (first match wins) — scan all of them |
+| "open the HTML file so the user can see it" | `::preview{file="<path>.html"}` on its own line renders inline in the desktop app |
+| `~/.claude/skills/` install paths | `$HERMES_HOME/skills/<category>/` |
+| `${CLAUDE_SKILL_DIR}` | the skill's real dir, or a repo-relative `references/` path |
+| `sub-agents` as an assumed primitive | `delegate_task` — and check the concurrency cap against the batch size (below) |
+
+Two things to verify while porting, both cheap and both easy to get wrong:
+
+- **Batch size vs `delegation.max_concurrent_children`.** A skill that fans out N children needs
+  N ≤ the cap. Resolve the LIVE value, not the config file's absence of a key —
+  `hermes config get delegation.max_concurrent_children` (the loaded default is 10) or
+  `python -c "from tools.delegate_tool import _get_max_concurrent_children as f; print(f())"`
+  from the Hermes venv. Write the number into the ported skill as a fail-fast check, not as prose.
+- **Frontmatter has to be rebuilt to Hermes shape.** Claude-Code repos often ship `name` +
+  `description` only (sometimes with blank lines inside the frontmatter block); add `version`,
+  `author` (credit the original human first, then the porter), `license`, `platforms`, and
+  `metadata.hermes.{tags,related_skills}`. Keep the description ≤ 60 chars — the index truncates
+  at 57.
+
+Porting counts as authorship: cite the upstream repo(s) in the body, state what the port changed,
+and keep the upstream LICENSE terms.
 
 ## Hiding / freezing a skill you cannot uninstall
 
