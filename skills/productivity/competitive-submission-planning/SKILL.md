@@ -120,6 +120,7 @@ sample-sourcing risks sink more submissions than technical difficulty.
 
 ## Supporting files
 
+- `references/pkm-kc.md` — aturan naskah PKM-KC Belmawa yang sering menggugurkan (format berkas, batas RAB Tabel 2, bobot penilaian, sistematika). Muat sebelum menyusun proposal PKM-KC.
 - `scripts/md2docx.py` — markdown → DOCX with a configurable submission format
   (page size, font, size, line spacing, margins). Handles code blocks, merged
   tables, and inline bold/italic. Prints a verification summary after writing.

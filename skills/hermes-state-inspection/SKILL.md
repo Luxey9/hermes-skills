@@ -1,6 +1,6 @@
 ---
 name: hermes-state-inspection
-description: "Use when mapping Hermes sessions to projects."
+description: "Use when inspecting/recapping Hermes sessions or projects."
 version: 1.0.0
 author: curator
 license: MIT
@@ -41,10 +41,67 @@ CLI output first, SQLite second, source grep last.
 - Rename any session with `hermes sessions rename <id> <title>`; a `user`-sourced title is never overwritten by the auto-titler, while `derived`/`llm` titles can still be replaced on turns 2-3.
 - No config sources auto-titles from the project name; `auxiliary.title_generation.enabled: false` only disables auto-titling, it does not change its source.
 
+## Resolve an `@session` link or scroll inside one
+
+When the user pastes `@session:<profile>/<id>` (or asks "what about that chat
+where we..."), resolve it with `session_search` — do not guess from memory.
+
+1. Split the link on `/` into profile + id. Pass the id segment as
+   `session_id` and the profile segment as `profile`.
+   - `@session:default/20260101_120000_abcdef` → `profile="default"`,
+     `session_id="20260101_120000_abcdef"`.
+   - A link whose profile is the active one still works with `profile` set;
+     set it anyway so a non-default link resolves instead of erroring.
+2. `session_id` alone returns first ~20 + last ~40 messages with
+   `truncated: true` — enough to name the topic and find where it stopped,
+   not enough to recap the arc.
+3. To reach the middle, scroll: `session_id` + `around_message_id` + `window`
+   (clamped 1–20, default 5). Anchor only on a real id from a window you
+already received.
+   - The window reports `messages_before` / `messages_after`; when either is 0
+     you have hit that end. Re-anchor on the FIRST id to walk backward, the
+     LAST id to walk forward; the boundary message repeats as an orientation
+     marker.
+4. Read the whole thing in one call only when you need a full recap — the
+   store read in the section above is cheaper than many scroll windows.
+
+## Recap a whole session from the store
+
+`session_search` with `session_id` alone hydrates only the first ~20 and last
+~10 messages of a long session (it reports `truncated: true`) — enough to name
+the topic, not to recap the arc. For a full recap, read the store directly:
+
+```python
+con = sqlite3.connect(f"file:{home}/state.db?mode=ro", uri=True)
+rows = con.execute("select id, role, content, active, compacted"
+                   " from messages where session_id=? order by id", (sid,))
+```
+
+- Keep `user` + `assistant` rows only; `tool` rows are most of the volume and
+  none of the arc. Truncate assistant messages (~300 chars), keep user messages
+  whole, join into a scratch text file, then `read_file` it in one or two
+  passes. Never paste the raw dump into the reply.
+- `sessions.message_count` counts tool calls too — user turns are a small
+  fraction of it (a 600-message session can hold ~25 user turns).
+- Compacted history is replayed verbatim inside later context messages, so the
+  same turn can appear twice — merge duplicates instead of reporting repeated
+  work that only happened once.
+- `user`-role rows also carry injected notices (background-process completions,
+  model-changed banners, compaction summaries). Never attribute those to the
+  person; report only what they typed.
+
 ## Pitfalls
 
 - Quote Windows home paths on every shell call — an unquoted space splits the path into fake arguments and the lookup fails for syntax reasons, not missing data.
 - Scope recursive source searches to one subdirectory with a tight pattern — a full-tree grep over the Hermes source times out before returning, so narrow first, then widen only on zero hits.
 - Open `state.db` and `projects.db` read-only on every inspection — the gateway holds write locks while running and a read-write open can block or corrupt live state.
 - Never treat `project_meta.active_id` as session ownership — it names the selected project in the UI while each session maps independently through its own working directory.
-- Never promise project-named sessions by default — without an explicit `/new <name>` or a manual rename, every fresh session auto-titles from its first message.
+- Anchor scroll windows only on a message id that appeared in a previous
+  `session_search` result — ids computed by adding to an existing id are
+  rejected as `not in session_id`, and a linear guess can walk past the end of
+  a sparse id space and return an out-of-session anchor. If an anchor is
+  refused, re-scroll from the END id of the last window you actually received.
+- Never report a session's ending from truncated output alone — read the tail
+  with a scroll window first; a session can stop mid-tool-call and look
+  finished in the hydrated head.
+ — without an explicit `/new <name>` or a manual rename, every fresh session auto-titles from its first message.

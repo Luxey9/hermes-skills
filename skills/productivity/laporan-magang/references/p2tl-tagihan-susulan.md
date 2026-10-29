@@ -52,3 +52,7 @@
 - Luas 77,29 km²; 3 posko: Gunung Sahari, Kota, Kapuk; batas: Area Cengkareng (utara/timur), Area Cempaka Putih (selatan), Area Grogol & Kebon Jeruk (barat).
 - Struktur: Manager + AM Perencanaan, AM Konstruksi, AM Jaringan, AM Niaga, AM Transaksi Energi Listrik (TEL), AM Keuangan/SDM/Administrasi.
 - Divisi TEL = pemegang tugas billing, pengendalian susut, P2TL, AMR, pemeliharaan APP, manajemen segel — bagian paling relevan untuk topik P2TL.
+- **Pembagian tim P2TL lapangan**: *Mensar* = pelanggan menengah & besar (di atas 41,5 kVA s.d. 30 MVA); *Mencil* = pelanggan kecil (antara lain penertiban sambungan liar/P-IV).
+- **Sebutan lapangan golongan**: P1/P2/P3/P4 = Golongan I/II/III/IV (padanan PI–PIV). Di dokumen resmi tulis "Golongan IV (P-IV)", bukan "P4".
+- **Peran mahasiswa magang**: pendamping/helper (membawa & menyiapkan alat ukur, mencatat hasil ke Berita Acara) — bukan pelaksana pengukuran.
+- **Alat ukur**: *Calmet* = alat uji/kalibrasi kWh meter (mengukur error); *clamp meter/tang amper* = pengukur arus. Dua alat berbeda, jangan ditukar.

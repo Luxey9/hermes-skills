@@ -63,6 +63,7 @@ account for the index cost, verify discovery.
 | **Plugin-layout library** | `skills/<plugin-name>/` where the dir name == the skill `name` | copy the INNER dirs, not the wrapper |
 | **Single-skill repo** | repo root holds `SKILL.md` + `references/` | copy the whole repo as the skill dir |
 | **Tool distribution, not skills** | only `SKILL.md` is `install-<tool>`; payload is `.ts`/`.mjs`/assets | do NOT install. Report what it actually is (e.g. a lint-plugin installer) and ask |
+| **Tool repo vendoring agent skills** | large codebase (tens of MBs) with skills in `.agents/skills/` or `.claude/skills/` | do NOT clone/build full repo or run heavy npm/pip installs; download/copy only the specific `.agents/skills/<name>` directory (~20-50 KB) unless the user explicitly wants the native CLI binary installed |
 | **Repo already in the index cache** | the name only appears in `skills/.hub/index-cache/*.json` | that is the registry's catalog, not an install. Check the filesystem before telling the user a skill is missing |
 | **One file from a monorepo** | `github.com/<owner>/<repo>/blob/<ref>/<path>/SKILL.md` | `curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>/SKILL.md -o <dir>/SKILL.md` |
 
@@ -100,6 +101,7 @@ puts an installer in the system prompt and gives the user nothing to invoke.
   pass `C:/...` forward-slash paths. Run scratch work under `$HERMES_HOME/cache/scratch`.
 - **Large repo → sparse clone** (`--filter=blob:none --sparse` + `git sparse-checkout set skills`)
   before blaming the network.
+- **Distinguish repo size from skill payload size.** A GitHub repository size reported by the API includes git history, test fixtures, website assets, and native build artifacts (often 50–100+ MB). Check whether the skill payload is just an isolated subfolder (e.g. `.agents/skills/<name>`) so you don't burden disk or user expectations when only a ~25–50 KB instruction set is needed. Fetch via raw URLs directly instead of full clone.
 
 ## Report shape
 

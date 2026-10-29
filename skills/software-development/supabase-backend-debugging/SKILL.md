@@ -15,6 +15,8 @@ metadata:
 
 ## Overview
 
+See `references/leaderboard-scope-filter.md`, `references/weekly-leaderboard.md`, `references/prestige-reset.md`, and `references/postgrest-bulk-ops.md` for leaderboard scoping, weekly boards, prestige resets, and bulk ops. Data extraction: `references/postgrest-data-extraction.md`. Denied reads / 42501 / "progress shows 0": `references/rls-permission-denied.md`.
+
 A Supabase backend exposes everything you need over plain HTTP: schema, data,
 and every RPC. This skill is the fast path for two recurring requests:
 
@@ -30,7 +32,7 @@ JWT carries the proof — decode the payload and compare its `ref` claim with th
 ref in the configured URL, and its `role` claim with the role you need. Also
 parse the newer non-JWT formats (`sb_secret_` = service role, `sb_publishable_` =
 public) so a project that only exposes one style is not mistaken for a bad key.
-See `references/credential-claims-and-targeting.md`.
+See `references/credential-claims-and-targeting.md`. For user-supplied bulk row loads with no DB credential, see `references/bulk-inserts-via-sql-editor.md`.
 
 ## When to use
 

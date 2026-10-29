@@ -78,7 +78,42 @@ to the third. When the harness blocks you, deliver the unverified diff **plus** 
 short manual reproduction the user can run in 4-6 steps, and offer to fix the
 harness — a fabricated pass costs far more than an admitted gap.
 
+## When the browser is not available
+
+A blocked harness is not zero evidence. Before writing "unverified", collect what
+is still provable, strongest first:
+
+1. **Dependency-source ground truth.** The exact rule usually lives in the
+   installed package — read `node_modules/<pkg>/dist/**` for the validation
+   function, the constants, and the stylesheet it relies on, and quote it. This
+   is version-exact and beats both docs and recollection.
+2. **Emitted-markup evidence.** Render the component with `react-dom/server`
+   inside whatever provider it needs and with the props its real parent supplies,
+   then assert on the markup: attributes, classes, inline styles, ordering. This
+   catches whole classes of bug (element absent, wrong type, wrong geometry)
+   without a browser.
+3. **Invariant tests over source assets.** Parse the stylesheet/config and assert
+   the invariants the fix depends on — *including the dependency assumptions you
+   are leaning on*, so a version bump surfaces as a red test. Lock the mechanism
+   behind the bug CLASS, not the one symptom you happened to see.
+4. Typecheck + build — proves the prop/API is wired, not that behavior is right.
+
+State the smaller claim explicitly ("cannot replay the drag here; verified the
+markup, the dependency rule, and locked the invariants") and hand the user a 3-4
+step manual check — including a **hard refresh** when the change is CSS or JS,
+because a cached bundle makes them exercise the old code and report the fix as
+failed.
+
+Prefer a fix that does not depend on a runtime config value at all. When the fix
+rides on a mode flag, a passing typecheck proves the value reaches the library
+but not that it takes effect — remove the dependency, or make the config
+redundant, and the fix stops being hostage to it. Recipes in
+`references/offline-verification.md`.
+
 ## Pitfalls
+
+- **Fixed-height overlays clip their own controls.** When header/footer buttons look cut off top-and-bottom, suspect the container height constant first, not the button CSS — size the expanded container from content plus padding headroom, and pin header buttons to the top so they cannot slide under the badge.
+- **Ask for a screenshot on layout complaints and analyze the pixels.** A user photo of clipped controls localizes the fault (top inset vs container height vs overflow) faster than code reading — diagnose from the image before touching CSS.
 
 - **Bump the JS cache-buster on every front-end change.** A `?v=` query on the
   script tag is the deploy mechanism on no-build static sites — forget it and
@@ -114,6 +149,16 @@ harness — a fabricated pass costs far more than an admitted gap.
   report.
 - **Time-box the tooling.** A couple of honest attempts to get the browser
   driving, then stop. Burning the session on the harness is not verification.
+- **A harness that renders nothing is not evidence the element is absent.** A
+  component can silently emit nothing when its required provider or a required
+  prop is missing. Print the markup and confirm the elements you expect appear at
+  all before concluding anything from their absence — a wrong conclusion here
+  gets written into a skill and costs the next session the cheapest verification
+  tool it had.
+- **A typed prop that typechecks proves wiring, not behavior.** `tsc` passing on
+  a config prop means the value reaches the library, not that the library behaves
+  as you assume. Read the library's own rule or exercise it; never report the
+  prop itself as the fix.
 
 ## Going deeper
 
@@ -125,3 +170,6 @@ harness — a fabricated pass costs far more than an admitted gap.
   token to skip the login UI.
 - `references/postgrest-column-grants.md` — when a Supabase-backed app fails per
   role: distinguishing a missing column grant from a field stripped by a view.
+- `references/offline-verification.md` — collecting real evidence when the live
+  browser is unavailable: SSR markup harnesses, dependency-source ground truth,
+  CSS/markup invariant tests, and how to phrase the resulting claim.

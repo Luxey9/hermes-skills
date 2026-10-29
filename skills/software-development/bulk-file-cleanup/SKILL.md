@@ -52,6 +52,16 @@ them into classes:
 3. **Delete one class at a time**, reporting each result, so a mistake is bounded
    and visible.
 
+## Temp directories (kelas tersendiri — geretannya sama)
+
+"Hapus file temp" = bulk delete juga: ukuran dulu, lalu wipe target demi target.
+
+- Target Windows: `C:/Users/<u>/AppData/Local/Temp` (biasanya terbesar), `C:/Windows/Temp` (sebagian besar bisa dihapus tanpa elevasi; sisihkan beberapa entry denied), dan scratch dir aplikasi sendiri.
+- Hapus ISI via scandir walk (folder → rmtree, file → remove), BUKAN foldernya — proses yang hidup memegang handle di dalamnya; struktur direktori harus tetap ada.
+- File terkunci itu normal: hitung, skip, laporkan jumlahnya — jangan retry paksa.
+- Skan ukuran per direktori temp yang dikenal saja; du/scandir rekursif di atas root pengguna atau `C:\` penuh akan timeout.
+- Verifikasi sesudahnya dengan free-space delta (`shutil.disk_usage`); harapkan beberapa MB sudah terisi ulang antara scan dan wipe (browser/build menulis temp terus).
+
 ## Classify before proposing anything
 
 | class | test | delete? |

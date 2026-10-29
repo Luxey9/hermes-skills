@@ -56,3 +56,53 @@ Run additive migrations on the project the operational deployment uses. Hitting
 a sibling project is usually harmless (added column + defaulted function) but
 fixes nothing. If it happens, confirm old callers still work by replaying the
 previous argument list and checking you still reach the function's own guard.
+
+## 6. Migrating env to a NEW deployment of the same app
+
+When moving an app to a new hosting project/account (suspend, transfer, fork),
+the env snapshot that matches production is `vercel env pull` output
+(`.env.local` created by the CLI) — not the repo's hand-written `.env`, which
+is often a stale template from a different environment (unfilled `APP_URL="MY_APP_URL"`
+placeholders, older API keys). Diff the two before trusting either:
+
+```bash
+# which keys differ in NAME ...
+diff <(grep -oE '^[A-Z_]+' .env | sort -u) <(grep -oE '^[A-Z_]+' .env.local | sort -u)
+# ... and which same-named keys differ in VALUE
+while IFS='=' read -r k v; do case "$k" in ''|'#'*) continue;; esac; \
+  lv=$(grep -m1 "^$k=" .env.local | cut -d= -f2-); [ "$v" != "$lv" ] && echo "$k: BEDA"; done < .env
+```
+
+Rules for the move:
+
+- **Copy values from the pulled/live snapshot, never from the repo `.env`.**
+  The pull reflects what production actually runs; the template may carry
+  superseded keys (measured: `GEMINI_API_KEY` and `JWT_SECRET` differed between
+  the two files, and only one matched the live deployment).
+- **Exclude host-generated vars**: `VERCEL_OIDC_TOKEN` (and similar) are
+  auto-issued per project — carrying them over breaks the new deployment.
+- **A var present in the dashboard but absent from the pull is likely a
+  Sensitive one** (lock icon: value unreadable). Flag it `[ISI: source]` in the
+  handoff file instead of guessing; `SUPABASE_JWT_SECRET` lives in the Supabase
+  dashboard, not in any env file.
+- **Write the handoff as placeholders, never as pasted values.** Assembling a
+  "ready" env file invites fabricating a key whose value you never actually
+  read; generate the checklist with `[ISI: .env.local → line X]` pointers and
+  let the values be copied per-line.
+- **Single-line JSON secrets must be copied byte-exact** (e.g.
+  `FIREBASE_SERVICE_ACCOUNT`): one line with literal `\n` and its surrounding
+  quotes, because the server code parses exactly that shape — reformatting it
+  breaks the parser that unwraps it.
+- **CLI `env add` can report failure while succeeding: verify with `env ls` before
+  re-running.** Piping the value in (`input:`/stdin redirect) may fail the local
+  process after the CLI has already accepted the variable server-side, so re-running
+  the batch gets "has already been added to all Environments" on every name. Treat
+  that error as PROOF the variable is present with the intended value path — not a
+  failure to retry; a loop that blindly retries a failing push never learns this.
+- **After `vercel link`, prove WHICH project you linked before pushing anything.**
+  A same-named existing project is silently offered and accepted — you can end up
+  on the old (suspended) project, not a fresh one. `vercel env ls` decides it:
+  variables you never pushed plus creation dates months old = the existing project,
+  and the plan changes (unsuspend/transfer) instead of duplicating env.
+- After the new deployment is live, remember the downstream wiring: CORS {
+  origins}, SSO callback URLs, Supabase Auth redirect allow-list — any

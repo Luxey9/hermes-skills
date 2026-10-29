@@ -1,56 +1,78 @@
-# Struktur Laporan Magang (contoh: pedoman ITPLN)
+# Struktur Laporan Magang — Pedoman ITPLN 2025 (PD-A03-1-010-02, Revisi ke-2, 15 Des 2025)
 
-Bagian awal: halaman sampul (judul, logo, nama, NIM, lembaga, tahun), halaman judul, lembar pengesahan, ucapan terima kasih, daftar isi/tabel/gambar/lampiran.
+Dipakai untuk magang ITPLN yang berjalan setelah 15 Desember 2025 (termasuk magang Faqod 1 Sep 2026–30 Jan 2027). Pedoman Kerja Magang 2020 **tidak lagi jadi acuan** — struktur di bawah adalah versi baru. Sumber: `Pedoman Magang 2025.pdf` di folder magang user.
 
-## Bab I Pendahuluan
-- **1.1 Latar Belakang**: corong — masalah besar → solusi/regulasi → kendala teknis → konteks unit magang → pernyataan tujuan + judul. Tanpa angka privat.
-- **1.2 Ruang Lingkup**: mulai "Kegiatan kerja magang ini berfokus pada …", lalu daftar bernomor kegiatan yang dicakup.
-- **1.3 Tujuan Kerja Magang**: poin "Mengetahui… / Mampu…" spesifik.
-- **1.4 Manfaat**: 3 sub-grup — bagi mahasiswa/penulis, bagi perusahaan, bagi institusi.
-- **1.5 Rencana Waktu dan Penjadwalan**: tabel No | Periode (Minggu ke-n) | Kegiatan.
-- **1.6 Sistematika Penulisan**: 1 paragraf ringkas per bab (Bab I–V).
+## Susunan bab (Sistematika 5.6)
 
-## Bab II Gambaran Umum Perusahaan/Proyek (Sesuai Pedoman Resmi ITPLN)
-Empat subbab baku menurut Pedoman ITPLN 2020:
-- **2.1 Sejarah Singkat Perusahaan/Proyek** (nasional → unit pelaksana): narasi kronologis mengalir tanpa bullet points.
-- **2.2 Profil Umum Perusahaan/Proyek**: memuat logo & filosofi, visi, misi, tata nilai (AKHLAK), tugas pokok & permodalan, pilar strategis bisnis, serta profil operasional unit (alamat, luas wilayah, pembagian posko teknis, batas geografis, tabel profil, dan proses bisnis pelayanan pelanggan). Disajikan proporsional: narasi pengantar + poin/tabel yang tegas.
-- **2.3 Struktur Organisasi Perusahaan/Proyek**: pengantar manajerial + bagan struktur organisasi resmi unit (Gambar 2.2).
-- **2.4 Deskripsi Tugas**:
-  - 2.4.1 Uraian tugas pokok dan fungsi struktur organisasi (tujuan jabatan dalam bentuk narasi + rincian tugas pokok dalam poin/bullet).
-  - 2.4.2 Posisi penempatan mahasiswa dan tugas yang diberikan (deskripsi penempatan divisi, linearitas studi, serta rincian poin tugas teknis yang dikerjakan).
+**Bagian awal:** Halaman Judul · Halaman Pengesahan · Kata Pengantar · Daftar Isi · Daftar Tabel · Daftar Gambar · Daftar Lampiran. (Tidak ada lagi "Halaman Sampul" terpisah / "Ucapan Terima Kasih".)
 
-## Bab III Metode Pelaksanaan Kegiatan
-- **3.1 Rencana Kegiatan**: rencana langkah-langkah kerja berkala dan lokasi kegiatan (nama instansi, alamat, divisi penempatan).
-- **3.2 Pelaksanaan Kegiatan**: bidang kerja operasional, jam kerja & aturan K3, prosedur kerja/SOP (tahapan alur kerja dilengkapi bagan alir), logbook kegiatan (tabel No | Tanggal | Kegiatan | Bukti Dokumen), kendala dan pemecahan masalah/solusi.
+- **BAB I PENDAHULUAN** — 1.1 Latar Belakang · 1.2 Ruang Lingkup · 1.3 Tujuan dan Manfaat · 1.4 Sistematika Penulisan Laporan
+- **BAB II PROFIL PERUSAHAAN/PROYEK/INSTITUSI/ORGANISASI** — 2.1 Sejarah Singkat Perusahaan · 2.2 Profil Umum Perusahaan (logo, visi/misi, lingkup pekerjaan/portofolio) · 2.3 Struktur Organisasi · 2.4 Lokasi Pelaksanaan (alamat kantor, alamat lokasi magang, gambaran lingkungan kerja, wilayah operasional)
+- **BAB III METODE PELAKSANAAN MAGANG** — 3.1 Permasalahan/Fenomena · 3.2 Konsep Teori · 3.3 Rencana dan Jadwal Kerja (mengacu TOR Magang)
+- **BAB IV HASIL DAN PEMBAHASAN** — 4.1 Pelaksanaan Magang · 4.2 Penerapan Teori · 4.3 Hasil Kerja
+- **BAB V PENUTUP** — 5.1 Kesimpulan · 5.2 Saran · DAFTAR PUSTAKA (halaman baru)
 
-## Bab IV Konsep Teori dan Penerapan
-- **4.1 Konsep Teori**: landasan ilmiah, teori dasar (susut teknis/non-teknis, instrumen APP langsung/tidak langsung, CT/PT, regulasi P2TL, rumus error, rumus matematis TS).
-- **4.2 Penerapan**: tugas khusus di lapangan, analisis kasus nyata kelainan APP (misal: jumper kabel, segel rusak, polaritas CT terbalik), komparasi teori vs temuan lapangan, simulasi perhitungan energi terselamatkan (saving kWh) dan Tagihan Susulan (tanpa nominal privat), pemahaman kendala/keterbatasan.
+## Pemetaan dari struktur 2020 (draft lama user)
 
-## Bab V Penutup
-- **5.1 Kesimpulan**: pernyataan general dan spesifik berbasis temuan analisis.
-- **5.2 Saran**: rekomendasi aplikatif bagi perusahaan, perguruan tinggi, dan mahasiswa berikutnya.
+| Draft lama (2020) | Pedoman 2025 |
+|---|---|
+| 1.4 Rencana Waktu dan Penjadwalan | pindah ke **3.3 Rencana dan Jadwal Kerja** |
+| 1.5 Sistematika Penulisan | jadi **1.4 Sistematika Penulisan Laporan** |
+| 2.4 Deskripsi Tugas | tidak ada lagi; uraian tugas pokok gabung ke **2.3**, penugasan mahasiswa ke **2.4/4.1** |
+| 3.1 Rencana Kegiatan, 3.2 Pelaksanaan Kegiatan (+ kendala) | pelaksanaan → **4.1**; kendala/masalah → **3.1 Permasalahan/Fenomena** |
+| Bab IV 4.1 Konsep Teori | pindah ke **3.2 Konsep Teori** |
+| Bab IV 4.2 Penerapan | jadi **4.2 Penerapan Teori** (+ **4.3 Hasil Kerja** baru) |
 
-## Ketentuan Format & Tipografi (Pedoman ITPLN 2020)
-- **Ukuran Kertas & Margin Naskah Ujian (A4 70 gram)**: Kiri 4,0 cm, Kanan 2,0 cm, Atas 3,5 cm, Bawah 2,5 cm. Dicetak satu muka (single-sided). (Catatan: Laporan final pasca-sidang dicetak bolak-balik ukuran A5 80 gram).
-- **Jenis Huruf & Spasi**: Arial 12 pt dengan jarak 1,5 spasi. Judul Bab: Arial 14 pt BOLD UPPERCASE di tengah (centered). Judul Subbab: Arial 12 pt BOLD Title Case rata kiri. Judul Sub-subbab: Arial 12 pt Italic Title Case rata kiri.
-- **Penomoran Halaman**:
-  - Bagian awal (halaman judul s.d. daftar lampiran): Romawi kecil (i, ii, iii...) di tengah bawah.
-  - Bagian isi (Bab I s.d. Bab V) & penutup: Angka Arab (1, 2, 3...) di tengah bawah, jarak 1,5 cm dari tepi bawah. Dimulai dari angka 1 pada Bab I.
-  - **Aturan Halaman Ganjil Bab Baru**: Setiap awal BAB harus dimulai pada halaman GANJIL. Jika bab sebelumnya berakhir di halaman ganjil, tambahkan halaman kosong genap bertuliskan *"Halaman ini sengaja dikosongkan"* di tengah.
-- **Penomoran Tabel, Gambar, dan Persamaan**:
-  - Tabel: `Tabel [Bab].[Nomor]` (contoh: Tabel 2.1), ditulis di ATAS tabel rata kiri dengan spasi tunggal (1 spasi).
-  - Gambar: `Gambar [Bab].[Nomor]` (contoh: Gambar 2.1), ditulis di BAWAH gambar rata tengah (centered).
-  - Persamaan: Menggunakan equation editor Ms Word, nomor persamaan diletakkan di sisi kanan dicetak tebal: `qu = c.Nc + ... (2.1)`.
-- **Daftar Pustaka**: Menggunakan format APA Style, urut naik (*ascending*) nama belakang penulis pertama, sumber primer jurnal bereputasi $\le 5$ tahun terakhir.
-- **Lampiran Wajib**:
-  1. Surat Keterangan Telah Menyelesaikan Kerja Magang dari instansi.
-  2. RPKM (Rencana Pelaksanaan Kerja Magang).
-  3. Daftar Hadir Mahasiswa Kerja Magang (Absensi).
-  4. Laporan Pelaksanaan Kegiatan Harian (Log Book).
-  5. Laporan Mingguan Konsultasi Antar Pembimbing.
-  6. Foto Kegiatan: Minimal 3 lembar foto mahasiswa tampak wajah dalam suasana kerja + minimal 3 lembar foto perusahaan tampak dalam/luar.
+**Kalau draft ditulis dengan struktur 2020 dulu lalu di-remap belakangan** (skenario bila prodi belum mewajibkan 2025): sebagian besar beban = rename heading + pindah blok (1.4 rencana waktu → 3.3; konsep teori Bab IV → 3.2; pelaksanaan kegiatan → 4.1; penerapan → 4.2). Yang **bukan sekadar pindah** dan harus disiapkan saat remap:
+1. Tulis **3.1 Permasalahan/Fenomena** (bahan dari "Kendala dan Solusi" lama + latar belakang).
+2. Tulis **4.3 Hasil Kerja** (bahan dari penerapan/kesimpulan lama, dipisah sebagai subbab).
+3. Tambah **≥5 sitasi karya ilmiah dosen/publikasi ITPLN** di daftar pustaka.
+4. Ganti tipografi Word: margin **2,54 cm seragam** (dari 4/2/3,5/2,5), siapkan halaman awal model 2025 (Halaman Judul, Pengesahan, Kata Pengantar).
+5. Siapkan **TOR Magang** (dokumen administratif terpisah, tidak bisa muncul dari laporan).
+
+## Catatan isi tiap bab (topik P2TL/APP)
+
+- **1.1 Latar Belakang**: corong — masalah umum → regulasi → kendala teknis → konteks unit → pernyataan tujuan + judul. Tanpa angka privat.
+- **1.2 Ruang Lingkup**: mulai dengan fokus kegiatan, lalu daftar bernomor.
+- **1.3 Tujuan dan Manfaat**: tujuan pakai kata kerja terukur (mengetahui/menganalisis/menghitung); manfaat per pihak (mahasiswa, perusahaan, kampus).
+- **2.1 Sejarah**: narasi kronologis mengalir (nasional → unit), tanpa bullet.
+- **2.2 Profil Umum**: proporsional — narasi pengantar + poin/tabel (logo, visi, misi, AKHLAK, tugas pokok PKUK, permodalan, pilar bisnis, profil operasional unit + tabel).
+- **2.3 Struktur Organisasi**: pengantar manajerial + bagan resmi + uraian tujuan jabatan & tugas pokok per fungsi (narasi + poin).
+- **2.4 Lokasi Pelaksanaan**: alamat kantor, lingkungan kerja, unit penempatan + tugas yang diberikan, wilayah penugasan lapangan (posko/cakupan).
+- **3.1 Permasalahan/Fenomena**: kelainan/pelanggaran APP & NTL yang ditemukan — dasar penentuan fokus.
+- **3.2 Konsep Teori**: susut teknis/non-teknis, instrumen APP, regulasi P2TL, golongan pelanggaran, rumus TS/saving kWh.
+- **3.3 Rencana dan Jadwal Kerja**: tabel No | Periode (Minggu ke-n) | Rencana Kegiatan; sinkron dengan TOR.
+- **4.1 Pelaksanaan Magang**: tahapan, tugas harian, SOP P2TL, peran mahasiswa (+ logbook).
+- **4.2 Penerapan Teori**: analisis kasus nyata vs teori, komparasi, keterbatasan.
+- **4.3 Hasil Kerja**: rekapitulasi temuan, saving kWh, output/kontribusi.
+- **5.1/5.2**: kesimpulan per masalah; saran ke perusahaan/kampus/mahasiswa berikutnya.
+
+## Format penulisan (5.7)
+
+- Kertas A4; **margin atas/bawah/kiri/kanan masing-masing 2,54 cm** (seragam — beda dari 2020 yang 4/2/3,5/2,5).
+- Arial 12 pt, spasi antarbaris 1,5, **6 pt setelah akhir paragraf**, indentasi baris pertama 1,25 cm.
+- Seluruh dokumen digital (soft file); bab = angka Romawi, subbab = angka Arab (maks 4 level); judul tabel di ATAS tabel, judul gambar di BAWAH gambar; kata asing italic; persamaan pakai equation editor.
+- Pedoman 2025 tidak lagi mengatur cetak A5 pasca-sidang, warna sampul per fakultas, penomoran halaman romawi/arab, atau aturan halaman ganjil — detail lanjutan "mengacu Pedoman Penulisan Laporan" (cek ke prodi bila perlu).
+
+## Daftar Pustaka
+
+- **APA 7th Edition**, in-text (Penulis, Tahun); dibangkitkan pakai **Mendeley/Zotero**, bukan manual.
+- Sumber diutamakan terbitan **1–10 tahun terakhir**.
+- **Wajib mensitasi minimal 5 karya ilmiah dosen atau publikasi Institut Teknologi PLN.**
+
+## Lampiran yang dilampirkan di laporan
+
+Surat Tugas Magang · Surat Keterangan Selesai Magang · Log Book · Berita Acara Bimbingan Magang · Berita Acara Sidang · Penilaian Laporan Magang · Foto Dokumentasi Pelaksanaan.
+(Pedoman menyediakan 10 template: TOR Magang, Laporan, Surat Tugas, Surat Selesai, Log Book, BA Bimbingan, BA Sidang, Lembar Penilaian Sidang, Lembar Penilaian Pembimbing Lapangan, Foto Dokumentasi.)
+
+## Administratif penting
+
+- Peserta: aktif, **minimal semester 4**; mitra harus punya kerja sama resmi; **TOR Magang wajib** dibuat pada tahap pendaftaran/penempatan (Lampiran 1).
+- Sidang magang: kemeja putih + jas + dasi (laki-laki).
+- Dosen pembimbing: monitoring & pembimbingan minimal 1 kali (bukan 8x seperti aturan 2020).
 
 ## Catatan
+
 - Format periode magang: "1 September 2026 – 30 Januari 2027" — cek tahun ganda/salah.
-- Sampul laporan lama bisa tidak sinkron dengan topik baru; ingkatkan user.
+- Sampul/draft lama bisa tidak sinkron dengan topik baru; ingatkan user.
+- File kerja aktif: master `Draft Laporan Magang.md` (sementara struktur Pedoman 2020 sesuai keputusan user; remap ke 2025 nanti di akhir). Bab II sudah dilengkapi (2.2.1 Logo & Identitas, tabel profil, catatan batas wilayah dari peta; sisa [ISI]: logo, jumlah pelanggan/pegawai, nama pejabat & pembimbing lapangan, screenshot peta). `Draft Laporan Magang - Bab I-II (Pedoman 2025).md` = cangkang versi 2025 untuk remap.
